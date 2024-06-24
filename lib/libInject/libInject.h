@@ -1,0 +1,1 @@
+int injectCreateRemoteThread(void* payload);

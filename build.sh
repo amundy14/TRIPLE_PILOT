@@ -1,12 +1,15 @@
-#x86_64-w64-mingw32-gcc service.c -municode -Wall -Werror -s -o iso/service.exe
-#genisoimage iso > iso.iso
+#!/bin/bash
 
-PROJECTNAME="TWIN_PILOT"
+PROJECTNAME="TRIPLE_PILOT"
 
-mkdir iso
-
-cd $PROJECTNAME/build
-cmake ..
+cd build
+cmake .. 
 make
 
-rsync -r --info=progress2 ./* ../../iso/
+cd ..
+
+rm -rf ./vm/iso/*
+rsync -r --info=progress2 ./build/bin/* ./vm/iso
+#rsync -r --info=progress2 ./vm/isoextra/* ./vm/iso
+
+genisoimage -input-charset utf-8 ./vm/iso ./vm/isoextra > ./vm/iso.iso

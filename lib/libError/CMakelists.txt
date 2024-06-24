@@ -1,0 +1,3 @@
+add_library(libError STATIC libError.c)
+
+target_include_directories(libError PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

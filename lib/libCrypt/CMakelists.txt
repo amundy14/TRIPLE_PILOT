@@ -1,0 +1,3 @@
+add_library(libCrypt STATIC libCrypt.c)
+
+target_include_directories(libCrypt PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Set the project name
-project(TWIN_PILOT)
+project(TRIPLE_PILOT)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 
@@ -17,6 +17,9 @@ set(CMAKE_LINKER x86_64-w64-mingw32-ld)
 set(CMAKE_AR x86_64-w64-mingw32-ar)
 set(CMAKE_RANLIB x86_64-w64-mingw32-ranlib)
 
+# Mingw error commands
+set(CMAKE_CFLAGS "-Wall -Werror -Wpedantic")
+
 # Specify the path to MinGW root directory
 #set(MINGW_ROOT /usr/x86_64-w64-mingw32)
 
@@ -26,8 +29,9 @@ set(CMAKE_RANLIB x86_64-w64-mingw32-ranlib)
 #set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 #set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-include_directories(${MINGW_ROOT}/include)
-link_directories(${MINGW_ROOT}/lib)
+# Required for clang?
+#include_directories(${MINGW_ROOT}/include)
+#link_directories(${MINGW_ROOT}/lib)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
@@ -38,26 +42,32 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Add lower level CMake files
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/crypts)
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/debug)
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/inject)
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/proc)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libError)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libCrypt)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libDebug)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libInject)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libProc)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libMem)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libString)
 
 # Include the headers
-include_directories(${PROJECT_SOURCE_DIR}/lib/crypts)
-include_directories(${PROJECT_SOURCE_DIR}/lib/debug)
-include_directories(${PROJECT_SOURCE_DIR}/lib/inject)
-include_directories(${PROJECT_SOURCE_DIR}/lib/proc)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libError)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libCrypt)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libDebug)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libInject)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libProc)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libMem)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libString)
 
 # Source Files
 include_directories(${PROJECT_SOURCE_DIR}/src)
 set(SRC_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 
 # Add the executable
-add_executable(TWIN_PILOT ${SRC_FILES})
+add_executable(TRIPLE_PILOT ${SRC_FILES})
 
 # Link libraries to the executable
-target_link_libraries(TWIN_PILOT crypts debug cnoError inject proc)
+target_link_libraries(TRIPLE_PILOT libCrypt libDebug libError libInject libProc libMem libString)
 
 
 # Enable unit tests

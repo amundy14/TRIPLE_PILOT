@@ -1,0 +1,3 @@
+add_library(libString STATIC libString.c)
+
+target_include_directories(libString PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

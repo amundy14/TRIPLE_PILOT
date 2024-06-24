@@ -1,0 +1,3 @@
+add_library(libInject STATIC libInject.c)
+
+target_include_directories(libInject PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -36,7 +36,6 @@
 !/bin/.gitkeep
 
 # Project object files
-/lib/*
 !/lib/.gitkeep
 
 # Project logs files
@@ -51,3 +50,6 @@ vm/*
 
 # Cmake build files
 build/*
+
+# QEMU logs
+debug.log
