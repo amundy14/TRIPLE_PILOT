@@ -5,34 +5,6 @@ project(TRIPLE_PILOT)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 
-# Specify the cross-compilation tools
-set(CMAKE_SYSTEM_NAME Windows)
-set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
-set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
-
-# Specify the target environment
-set(CMAKE_C_COMPILER_TARGET x86_64-w64-mingw32)
-set(CMAKE_CXX_COMPILER_TARGET x86_64-w64-mingw32)
-set(CMAKE_LINKER x86_64-w64-mingw32-ld)
-set(CMAKE_AR x86_64-w64-mingw32-ar)
-set(CMAKE_RANLIB x86_64-w64-mingw32-ranlib)
-
-# Mingw error commands
-set(CMAKE_CFLAGS "-Wall -Werror -Wpedantic")
-
-# Specify the path to MinGW root directory
-#set(MINGW_ROOT /usr/x86_64-w64-mingw32)
-
-# Set the CMAKE_FIND_ROOT_PATH
-#set(CMAKE_FIND_ROOT_PATH ${MINGW_ROOT})
-#set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-#set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-#set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
-# Required for clang?
-#include_directories(${MINGW_ROOT}/include)
-#link_directories(${MINGW_ROOT}/lib)
-
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
@@ -67,7 +39,13 @@ set(SRC_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 add_executable(TRIPLE_PILOT ${SRC_FILES})
 
 # Link libraries to the executable
-target_link_libraries(TRIPLE_PILOT libCrypt libDebug libError libInject libProc libMem libString)
+target_link_libraries(TRIPLE_PILOT libCrypt)
+target_link_libraries(TRIPLE_PILOT libDebug)
+target_link_libraries(TRIPLE_PILOT libError)
+target_link_libraries(TRIPLE_PILOT libInject)
+target_link_libraries(TRIPLE_PILOT libProc)
+target_link_libraries(TRIPLE_PILOT libMem)
+target_link_libraries(TRIPLE_PILOT libString)
 
 
 # Enable unit tests
