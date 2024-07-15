@@ -7,12 +7,22 @@
 #define DPRINT(...) do {} while (0)
 #endif
 
+#define SET_RETVAL(retval, value) retval = value; \
+	DPRINT("[-] Failed with error: %d at %d\n", retval, __LINE__); \
+	goto CLEANUP;
+
 #define CHECK_RETVAL(retval, funcName) if(retval) { \
 	DPRINT("[-] %s failed with error: %d at %d\n", funcName, retval, __LINE__); \
 	goto CLEANUP; }
 
 #define CHECK_RETVAL_NV(retval, funcName, varToCheck, valToCheck, newRet) \
 	if(varToCheck == valToCheck) { \
+		retVal = newRet; \
+		DPRINT("[-] %s failed with error: %d at %d\n", funcName, retval, __LINE__); \
+	goto CLEANUP; }
+
+#define CHECK_RETVAL_NV_NE(retval, funcName, varToCheck, valToCheck, newRet) \
+	if(varToCheck != valToCheck) { \
 		retVal = newRet; \
 		DPRINT("[-] %s failed with error: %d at %d\n", funcName, retval, __LINE__); \
 	goto CLEANUP; }
