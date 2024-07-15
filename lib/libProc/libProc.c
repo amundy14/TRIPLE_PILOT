@@ -43,6 +43,6 @@ int GetPidByName(const wchar_t* nameOfProcess, int* pid){
 	retVal = 0; // reset retval to 0
 
 CLEANUP:
-	SAFEHANDLEFREE(snapShot);
+	SAFE_CLOSEHANDLE(snapShot);
 	return retVal;
 }
