@@ -21,6 +21,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libInject)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libProc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libMem)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libString)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libFile)
 
 # Include the headers
 include_directories(${PROJECT_SOURCE_DIR}/lib/libError)
@@ -30,6 +31,7 @@ include_directories(${PROJECT_SOURCE_DIR}/lib/libInject)
 include_directories(${PROJECT_SOURCE_DIR}/lib/libProc)
 include_directories(${PROJECT_SOURCE_DIR}/lib/libMem)
 include_directories(${PROJECT_SOURCE_DIR}/lib/libString)
+include_directories(${PROJECT_SOURCE_DIR}/lib/libFile)
 
 # Source Files
 include_directories(${PROJECT_SOURCE_DIR}/src)
@@ -46,6 +48,7 @@ target_link_libraries(TRIPLE_PILOT libInject)
 target_link_libraries(TRIPLE_PILOT libProc)
 target_link_libraries(TRIPLE_PILOT libMem)
 target_link_libraries(TRIPLE_PILOT libString)
+target_link_libraries(TRIPLE_PILOT libFile)
 
 
 # Enable unit tests
