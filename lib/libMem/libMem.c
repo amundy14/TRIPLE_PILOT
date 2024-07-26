@@ -20,7 +20,7 @@ int openNamedMemory(wchar_t* name, unsigned long buf_size, struct namedMemory* m
     DPRINT("openNamedMemory\n");
 
     int retVal = NO_ERROR;
-    HANDLE mapFile = NULL;
+    //HANDLE mapFile = NULL;
     wchar_t* event_name = NULL;
     wchar_t* mutex_name = NULL;
     unsigned long long name_len = 0;
@@ -35,21 +35,19 @@ int openNamedMemory(wchar_t* name, unsigned long buf_size, struct namedMemory* m
         SET_RETVAL(retVal, "wcslen", BAD_PARAMETER);
     }
 
-    mapFile = CreateFileMappingW(
+    mem->mapFile = CreateFileMappingW(
         INVALID_HANDLE_VALUE, 
         NULL,
         PAGE_READWRITE, 
         0, 
         buf_size, 
         name);
-    CHECK_RETVAL_GLE(retVal, "CreateFileMappingW", mapFile, NULL);
+    CHECK_RETVAL_GLE(retVal, "CreateFileMappingW", mem->mapFile, NULL);
 
     mem->buf_size = buf_size;
 
-    mem->buf = MapViewOfFile(mapFile, FILE_MAP_ALL_ACCESS, 0, 0, mem->buf_size);
+    mem->buf = MapViewOfFile(mem->mapFile, FILE_MAP_ALL_ACCESS, 0, 0, mem->buf_size);
     CHECK_RETVAL_GLE(retVal, "MapViewOfFile", mem->buf, NULL);
-
-    DPRINT("mem->buf: %lu\n", *(unsigned long long*)(mem->buf));
 
     event_name = calloc(name_len + 2, sizeof(wchar_t));
     if(event_name == NULL){
@@ -79,7 +77,7 @@ int openNamedMemory(wchar_t* name, unsigned long buf_size, struct namedMemory* m
 CLEANUP:
     SAFE_FREE(event_name);
     SAFE_FREE(mutex_name);
-    SAFE_CLOSEHANDLE(mapFile);
+    //SAFE_CLOSEHANDLE(mapFile);
 
     return retVal;
 }
@@ -113,6 +111,8 @@ int closeNamedMemory(struct namedMemory* mem){
 
     retVal = UnmapViewOfFile(mem->buf);
     CHECK_RETVAL_GLE(retVal, "UnmapViewOfFile", retVal, 0);
+
+    SAFE_CLOSEHANDLE(mem->mapFile);
 
     mem->buf = NULL;
 
@@ -150,9 +150,7 @@ int writeNamedMemory(void* buf, unsigned long buf_size, struct namedMemory* mem)
 			break;
 	}
 
-    DPRINT("mem->buf: %lu   buf: %lu   buf_size: %lu\n", *(unsigned long long*)(mem->buf), *(unsigned long long*)buf, buf_size);
     memcpy(mem->buf, buf, buf_size);
-    DPRINT("mem->buf: %lu   buf: %lu   buf_size: %lu\n", *(unsigned long long*)(mem->buf), *(unsigned long long*)buf, buf_size);
 
     retVal = SetEvent(mem->writeEvent);
     CHECK_RETVAL_GLE(retVal, "SetEvent", retVal, 0);
@@ -201,9 +199,7 @@ int readNamedMemory(struct namedMemory* mem, void** buf, unsigned long* buf_size
         *buf_size = mem->buf_size;
     }
 
-    DPRINT("mem->buf: %lu   buf: %lu   buf_size: %lu\n", *(unsigned long long*)(mem->buf), **(unsigned long long**)buf, *buf_size);
     memcpy(*buf, mem->buf, mem->buf_size);
-    DPRINT("mem->buf: %lu   buf: %lu   buf_size: %lu\n", *(unsigned long long*)(mem->buf), **(unsigned long long**)buf, *buf_size);
 
     retVal = ReleaseMutex(mem->mutex);
     CHECK_RETVAL_GLE(retVal, "ReleaseMutex", retVal, 0);

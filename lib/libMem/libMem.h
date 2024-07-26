@@ -10,6 +10,7 @@ struct namedMemory{
     wchar_t* name;
     unsigned long buf_size;
     void* buf;
+    HANDLE mapFile;
 };
 
 int openNamedMemory(wchar_t* name, unsigned long bufferSize, struct namedMemory* mem);
