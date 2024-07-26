@@ -2,6 +2,7 @@
 
 #define SAFE_VIRTFREE(var) if(var != NULL) { VirtualFree(var, 0, MEM_RELEASE); var = NULL; }
 #define SAFE_CLOSEHANDLE(var) if(var != NULL && var != INVALID_HANDLE_VALUE) { CloseHandle(var); var = NULL; }
+#define SAFE_FREE(var) if(var != NULL) {free(var);}
 
 struct namedMemory{
     HANDLE mutex;
