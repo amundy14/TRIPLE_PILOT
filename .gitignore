@@ -38,10 +38,6 @@
 # Project object files
 !/lib/.gitkeep
 
-# Project logs files
-/log/*
-!/log/.gitkeep
-
 # Clangd cache files
 .cache/*
 
