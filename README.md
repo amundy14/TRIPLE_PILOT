@@ -9,7 +9,7 @@ Since I already had multiple processes on hand, this provided good opportunity t
 
 #### Compilation
 You will need to adjust the defines at the top of src/main.c to point at where you intend to put the payload on disk and where your shellcode is before compiling.  
-The build script will run CMake to compile all the libraries I've included and then build the main program. It will then package up the compiled artifacts into an .iso, which is convenient for testing in VMs.  
+The build script will run CMake to compile all the libraries I've included and then build the main program.  
 In the build script, select which compiler you want to use by uncommenting the appropriate CMake command.
 
 #### Usage
@@ -20,7 +20,6 @@ The main dependencies (that aren't typically installed) are:
  - cmake
  - make
  - mingw-w64
- - genisoimage
 
 In addition, clang can be used as an alternate compiler. In this configuration, it relies on the headers from mingw, so don't skip installing that.
 
