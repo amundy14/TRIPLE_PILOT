@@ -11,7 +11,6 @@
 #include <winnt.h>
 
 #include "libMem.h"
-#include "libError.h"
 #include "libDebug.h"
 
 // Creates a named file mapping

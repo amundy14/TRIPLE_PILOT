@@ -28,9 +28,6 @@ add_compile_options(
     #-flto
 )
 
-# Mingw error commands
-#set(CMAKE_CFLAGS "-Os -Wextra -Wall -Werror -pedantic -fstack-protector-strong -fsanitize=address -fsanitize=undefined -fsanitize=leak -fstack-clash-protection -funroll-loops -fanalyzer")
-
 # Specify the path to MinGW root directory
 set(MINGW_ROOT /usr/x86_64-w64-mingw32)
 

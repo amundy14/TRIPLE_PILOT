@@ -12,7 +12,6 @@
 #include "libProc.h"
 #include "libCrypt.h"
 #include "libInject.h"
-#include "libError.h"
 #include "libDebug.h"
 #include "libMem.h"
 

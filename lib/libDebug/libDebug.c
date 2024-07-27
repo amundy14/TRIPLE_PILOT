@@ -3,7 +3,6 @@
 
 #include <windows.h>
 
-#include "libError.h"
 #include "libDebug.h"
 
 int writeToLog(const char* filename, const char* format, ...){

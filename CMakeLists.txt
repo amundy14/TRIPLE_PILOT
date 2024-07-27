@@ -14,7 +14,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Add lower level CMake files
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libError)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libCrypt)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libDebug)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libInject)
@@ -24,7 +23,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libString)
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/libFile)
 
 # Include the headers
-include_directories(${PROJECT_SOURCE_DIR}/lib/libError)
 include_directories(${PROJECT_SOURCE_DIR}/lib/libCrypt)
 include_directories(${PROJECT_SOURCE_DIR}/lib/libDebug)
 include_directories(${PROJECT_SOURCE_DIR}/lib/libInject)
@@ -43,7 +41,6 @@ add_executable(TRIPLE_PILOT ${SRC_FILES})
 # Link libraries to the executable
 target_link_libraries(TRIPLE_PILOT libCrypt)
 target_link_libraries(TRIPLE_PILOT libDebug)
-target_link_libraries(TRIPLE_PILOT libError)
 target_link_libraries(TRIPLE_PILOT libInject)
 target_link_libraries(TRIPLE_PILOT libProc)
 target_link_libraries(TRIPLE_PILOT libMem)

@@ -4,7 +4,6 @@
 
 #include "libFile.h"
 #include "libDebug.h"
-#include "libError.h"
 
 // TODO: This could be made more efficient. It technically reads the file twice.
 int readFile(char* pathToFile, char** fileBuffer, int* bufferLen){

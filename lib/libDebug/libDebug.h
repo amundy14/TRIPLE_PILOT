@@ -1,5 +1,21 @@
 #define DEBUG 1
-#define LOGFILE "C:\\users\\redteam\\desktop\\log.log"
+
+#ifndef NO_ERROR
+#define NO_ERROR 0 // Comes from Windows.h usually
+#endif
+
+#define PAYLOAD_NOT_FOUND 1000001
+#define ALLOC_ERROR 1000002
+#define FILE_ERROR_OPEN 1000003
+#define FILE_ERROR_READ 1000004
+#define FILE_ERROR_WRITE 1000005
+#define EXEC_ERROR_RUN 1000006
+#define BAD_PARAMETER 1000007
+#define INSUFFICIENT_SPACE 1000008
+
+#define UNKNOWN_ERROR 9999999
+
+#define LOGFILE "C:\\log.log"
 
 #ifdef DEBUG
 #define DPRINT(format, ...) writeToLog(LOGFILE, format, ##__VA_ARGS__)

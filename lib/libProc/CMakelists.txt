@@ -2,7 +2,6 @@ add_library(libProc STATIC libProc.c)
 
 target_include_directories(libProc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(libProc PRIVATE libError)
 target_link_libraries(libProc PRIVATE libDebug)
 target_link_libraries(libProc PRIVATE libMem)
 target_link_libraries(libProc PRIVATE libString)
